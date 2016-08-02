@@ -20,27 +20,12 @@ public:
 
     }
 
-private:
     ~FiniteAutomata()
     {
-        for ( int k(0)
-            ; k < num_patterns
-            ; ++k
-            )
-        {
-            for ( int i(0)
-                ; i < M[k]+1
-                ; ++i
-                )
-            {
-                delete [] TF[k][i];
-            }
-            delete [] TF[M[k]+1];
-        }
-        delete [] M;
-        delete [] state;
+
     }
  
+private:
     int getNextnstate ( std::vector<int> const & pat
                      , int M
                      , int nstate
@@ -89,6 +74,17 @@ private:
                TF[nstate][x] = getNextnstate(pat, M,  nstate, x);
     }
 
+    void reset_state()
+    {
+        for ( int k(0)
+            ; k < num_patterns
+            ; ++k
+            )
+        {
+            state[k] = 0;
+        }
+    }
+
 public:
     void init_search ( std::vector<std::vector<int> > const & p_patterns
                      )
@@ -124,25 +120,33 @@ public:
         }
      
         state = new int[num_patterns];
-        for ( int k(0)
-            ; k < num_patterns
-            ; ++k
-            )
-        {
-            state[k] = 0;
-        }
     }
 
     int operator () ( int input )
     {
-        for ( int k(0)
+        for ( std::size_t k(0)
             ; k < patterns.size()
             ; ++k
             )
         {
             state[k] = TF[k][state[k]][input];
-            if (state[k] == M[k])
+        }
+        int max_state = 0;
+        for ( std::size_t k(0)
+            ; k < patterns.size()
+            ; ++k
+            )
+        {
+            max_state = std::max ( state[k] , max_state );
+        }
+        for ( std::size_t k(0)
+            ; k < patterns.size()
+            ; ++k
+            )
+        {
+            if (state[k] == M[k] && max_state <= M[k])
             {
+                reset_state();
                 return k;
             }
         }

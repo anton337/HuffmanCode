@@ -1,3 +1,5 @@
+#include "compression.h"
+
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
@@ -12,127 +14,6 @@
 
 #include "finite_automata.h"
 
-int  encode ( char                                    const * raw_input
-            , char                                          * encoded_output
-            , std::map < char , std::vector < int > >       & huffman_code
-            , std::size_t                                     num_char
-            , int                                             num_bits
-            )
-{
-    std::size_t output_index = 0;
-    switch ( num_bits )
-    {
-        case 2:
-            {
-                for ( std::size_t k(0)
-                    ; k < num_char
-                    ; ++k
-                    )
-                {
-                    int ind_1 = get_index2(raw_input[k],0);
-                    int ind_2 = get_index2(raw_input[k],2);
-                    int ind_3 = get_index2(raw_input[k],4);
-                    int ind_4 = get_index2(raw_input[k],6);
-                    for ( std::size_t i(0)
-                        ; i < huffman_code[ind_1].size()
-                        ; ++i
-                        )
-                    {
-                        set_bit ( encoded_output[output_index/8]
-                                , output_index%8
-                                , huffman_code[ind_1][i]==1
-                                );
-                        ++output_index;
-                    }
-                    for ( std::size_t i(0)
-                        ; i < huffman_code[ind_2].size()
-                        ; ++i
-                        )
-                    {
-                        set_bit ( encoded_output[output_index/8]
-                                , output_index%8
-                                , huffman_code[ind_2][i]==1
-                                );
-                        ++output_index;
-                    }
-                    for ( std::size_t i(0)
-                        ; i < huffman_code[ind_3].size()
-                        ; ++i
-                        )
-                    {
-                        set_bit ( encoded_output[output_index/8]
-                                , output_index%8
-                                , huffman_code[ind_3][i]==1
-                                );
-                        ++output_index;
-                    }
-                    for ( std::size_t i(0)
-                        ; i < huffman_code[ind_4].size()
-                        ; ++i
-                        )
-                    {
-                        set_bit ( encoded_output[output_index/8]
-                                , output_index%8
-                                , huffman_code[ind_4][i]==1
-                                );
-                        ++output_index;
-                    }
-                }
-            }
-            break;
-        case 4:
-            {
-                for ( std::size_t k(0)
-                    ; k < num_char
-                    ; ++k
-                    )
-                {
-                    int ind_1 = get_index2(raw_input[k],0);
-                    int ind_2 = get_index2(raw_input[k],4);
-                    for ( std::size_t i(0)
-                        ; i < huffman_code[ind_1].size()
-                        ; ++i
-                        )
-                    {
-                        set_bit ( encoded_output[output_index/8]
-                                , output_index%8
-                                , huffman_code[ind_1][i]==1
-                                );
-                        ++output_index;
-                    }
-                    for ( std::size_t i(0)
-                        ; i < huffman_code[ind_2].size()
-                        ; ++i
-                        )
-                    {
-                        set_bit ( encoded_output[output_index/8]
-                                , output_index%8
-                                , huffman_code[ind_2][i]==1
-                                );
-                        ++output_index;
-                    }
-                }
-            }
-            break;
-        default:
-            {
-
-            }
-            break;
-    }
-    return output_index;
-}
-
-
-void decode ( char                                    const * encoded_input
-            , char                                          * decoded_output
-            , std::map < char , std::vector < int > >       & huffman_code
-            , std::size_t                                     num_char
-            , int                                             num_bits
-            )
-{
-
-}
 
 int main()
 {
@@ -272,6 +153,11 @@ int main()
     std::cout << 100 * (float)(output_index) / (float)(ovec.size()*sizeof(long)) << "%" << std::endl;
     ovec . resize ( (output_index / 8 + 1) );
     std::cout << 8*data.size() << " " << ovec.size() << std::endl;
+    decode ( oarray
+           , carray
+           , huffman_code
+           , 8
+           );
     return 0;
 }
 
