@@ -1,5 +1,8 @@
+target=huffman
+
 all:
-	g++ -O3 -g0 main.cpp
+	g++ -Wall -O3 -g0 -o ${target} main.cpp
 
 clean:
-	rm -f a.out
+	rm -f ${target}
+

@@ -6,184 +6,11 @@
 #include <map>
 #include <math.h>
 
-void set_bit(char & number,int x,bool o)
-{
-    if ( o )
-    {
-        number |= 1 << x;
-    }
-    else
-    {
-        number &= ~(1 << x);
-    }
-}
+#include "bits.h"
 
-int get_bit(char x,int bit)
-{
-    return (x >> bit) & 1;
-}
+#include "huffman.h"
 
-int get_index1(char x,int offset)
-{
-    return   (int)((x >> offset) & 1) 
-           ;
-}
-
-int get_index2(char x,int offset)
-{
-    return   ((int)((x >>  offset   ) & 1) << 1) 
-           + ((int)((x >> (offset+1)) & 1)     )
-           ;
-}
-
-int get_index3(char x,int offset)
-{
-    return   ((int)((x >>  offset   ) & 1) << 2) 
-           + ((int)((x >> (offset+1)) & 1) << 1)
-           + ((int)((x >> (offset+2)) & 1)     )
-           ;
-}
-
-int get_index4(char x,int offset)
-{
-    return   ((int)((x >>  offset   ) & 1) << 3) 
-           + ((int)((x >> (offset+1)) & 1) << 2)
-           + ((int)((x >> (offset+2)) & 1) << 1)
-           + ((int)((x >> (offset+3)) & 1)     )
-           ;
-}
-
-void print(char x)
-{
-    for ( int k(0)
-        ; k < 8
-        ; ++k
-        )
-    {
-        std::cout << get_bit(x,k);
-    }
-    std::cout << std::endl;
-}
-
-////////////////////////////////////////
-//                                    //
-// Huffman Code                       //
-//                                    //
-////////////////////////////////////////
-//                                    //
-// 0                                  //
-// 10                                 //
-// 110                                //
-// 111                                //
-//                                    //
-//             /\                     //
-//            /  \                    //
-//           0   /\                   //
-//              /  \                  //
-//             10  /\                 //
-//                /  \                //
-//              110  111              //
-//                                    //
-////////////////////////////////////////
-
-struct HuffmanNode
-{
-    HuffmanNode * O;
-    HuffmanNode * I;
-    char c;
-    float freq;
-    HuffmanNode ( char _c , float _freq )
-    : O    ( NULL   )
-    , I    ( NULL   )
-    , c    ( _c     )
-    , freq ( 1.0/_freq )
-    {
-
-    }
-    HuffmanNode ( HuffmanNode * o , HuffmanNode * i )
-    : O ( o )
-    , I ( i )
-    , c ( '*' )
-    , freq ( 1.0 / ( 1.0/o->freq + 1.0/i->freq ) )
-    {
-
-    }
-};
-
-struct HuffmanComparator
-{
-    bool operator () ( HuffmanNode const * a , HuffmanNode const * b )
-    {
-        return a->freq < b->freq;
-    }
-} huffmanComparator ;
-
-void print_heap ( HuffmanNode const * N , std::string prefix = "" )
-{
-    if ( N -> I == NULL && N -> O == NULL )
-    {
-        std::cout << prefix << " - " << (int)N->c << " " << N->freq << std::endl;
-    }
-    else
-    {
-        print_heap ( N -> I , prefix+"1" );
-        print_heap ( N -> O , prefix+"0" );
-    }
-}
-
-void populate_huffman_code ( HuffmanNode const * N 
-                           , std::map < char , std::vector < int > > & huffman_code 
-                           , std::vector < int > address = std::vector < int > ()
-                           )
-{
-    if ( N -> I == NULL && N -> O == NULL )
-    {
-        huffman_code [ N->c ] = address;
-    }
-    else
-    {
-        std::vector < int > address_1 = address;
-        address_1 . push_back ( 1 );
-        populate_huffman_code ( N -> I 
-                              , huffman_code
-                              , address_1
-                              );
-        std::vector < int > address_0 = address;
-        address_0 . push_back ( 0 );
-        populate_huffman_code ( N -> O 
-                              , huffman_code
-                              , address_0
-                              );
-    }
-}
-
-void construct_huffman_code ( std::map < char , long >                const & histogram 
-                            , std::map < char , std::vector < int > >       & huffman_code
-                            )
-{
-    std::vector < HuffmanNode * > nodes;
-    std::map < char , long > :: const_iterator it = histogram . begin () ;
-    while ( it != histogram . end () )
-    {
-        nodes . push_back ( new HuffmanNode ( it->first , it->second ) );
-        ++it;
-    }
-    std::make_heap ( nodes . begin () , nodes . end () , huffmanComparator );
-    while ( nodes . size () > 1 )
-    {
-        std::make_heap ( nodes . begin () , nodes . end () , huffmanComparator );
-        HuffmanNode * I = nodes . front ();
-        std::pop_heap ( nodes . begin () , nodes . end () , huffmanComparator );
-        nodes . pop_back ();
-        HuffmanNode * O = nodes . front ();
-        std::pop_heap ( nodes . begin () , nodes . end () , huffmanComparator );
-        nodes . pop_back ();
-        nodes . push_back ( new HuffmanNode ( I , O ) );
-        std::push_heap ( nodes . begin () , nodes . end () );
-    }
-    populate_huffman_code ( nodes[0] , huffman_code );
-    print_heap ( nodes[0] );
-}
+#include "finite_automata.h"
 
 int  encode ( char                                    const * raw_input
             , char                                          * encoded_output
@@ -296,117 +123,6 @@ int  encode ( char                                    const * raw_input
     return output_index;
 }
 
-#define NUM_TRANSITIONS 2
- 
-int getNextState ( std::vector<int> const & pat
-                 , int M
-                 , int state
-                 , int x
-                 )
-{
-    // If the character c is same as next character in pattern,
-    // then simply increment state
-    if (state < M && x == pat[state])
-        return state+1;
- 
-    int ns, i;  // ns stores the result which is next state
- 
-    // ns finally contains the longest prefix which is also suffix
-    // in "pat[0..state-1]c"
- 
-    // Start from the largest possible value and stop when you find
-    // a prefix which is also suffix
-    for (ns = state; ns > 0; ns--)
-    {
-        if(pat[ns-1] == x)
-        {
-            for(i = 0; i < ns-1; i++)
-            {
-                if (pat[i] != pat[state-ns+1+i])
-                    break;
-            }
-            if (i == ns-1)
-                return ns;
-        }
-    }
- 
-    return 0;
-}
- 
-/* This function builds the TF table which represents Finite Automata for a
-   given pattern  */
-void computeTF ( std::vector<int> const & pat
-               , int M
-               , int ** TF
-               )
-{
-    int state, x;
-    for (state = 0; state <= M; ++state)
-        for (x = 0; x < NUM_TRANSITIONS; ++x)
-           TF[state][x] = getNextState(pat, M,  state, x);
-}
- 
-/* Prints all occurrences of pat in txt */
-void search ( std::vector<std::vector<int> > const & patterns
-            , std::vector<int>               const & txt
-            )
-{
-    int N = txt.size();
-
-    int M[patterns.size()];
-    for ( int k(0)
-        ; k < patterns.size()
-        ; ++k
-        )
-    {
-        M[k] = patterns[k].size();
-    }
- 
-    int *** TF = new int**[patterns.size()];
- 
-    for ( int k(0)
-        ; k < patterns.size()
-        ; ++k
-        )
-    {
-        TF[k] = new int*[M[k]+1];
-        for ( int i(0)
-            ; i < M[k]+1
-            ; ++i
-            )
-        {
-            TF[k][i] = new int[NUM_TRANSITIONS];
-        }
-        computeTF(patterns[k], M[k], TF[k]);
-    }
- 
-    // Process txt over FA.
-    int state[patterns.size()];
-    for ( int k(0)
-        ; k < patterns.size()
-        ; ++k
-        )
-    {
-        state[k] = 0;
-    }
-    for ( int i(0)
-        ; i < N
-        ; i++
-        )
-    {
-        for ( int k(0)
-            ; k < patterns.size()
-            ; ++k
-            )
-        {
-            state[k] = TF[k][state[k]][txt[i]];
-            if (state[k] == M[k])
-            {
-                printf ("pattern %d found at index %d\n", k, i-M[k]+1);
-            }
-        }
-    }
-}
 
 void decode ( char                                    const * encoded_input
             , char                                          * decoded_output
@@ -449,7 +165,7 @@ int main()
                 {
                     histogram[(char)b] = 0;
                 }
-                for ( int k(0)
+                for ( std::size_t k(0)
                     ; k < data.size()
                     ; ++k
                     )
@@ -487,74 +203,6 @@ int main()
                 std::cout << std::endl;
             }
             break;
-        case 3:
-            {
-                data.resize((data.size()/3+1)*3);
-                void* array = &data[0];
-                char* carray = reinterpret_cast<char*>(array);
-                for ( int b(0)
-                    ; b < bits
-                    ; ++b
-                    )
-                {
-                    histogram[(char)b] = 1;
-                }
-                for ( int k(0)
-                    ; k*3 < data.size()
-                    ; ++k
-                    )
-                {
-                    for ( int i(0)
-                        ; i < 24
-                        ; i += 3
-                        )
-                    {
-                        {
-                            int ind1   = get_index3(carray[k*24  +i],0);
-                            int ind2   = get_index3(carray[k*24  +i],3);
-                            int ind3_a = get_index2(carray[k*24  +i],6);
-                            int ind3_b = get_index1(carray[k*24+1+i],0);
-                            int ind3 = (ind3_a << 1) + ind3_b;
-                            histogram[(char)ind1]++;
-                            histogram[(char)ind2]++;
-                            histogram[(char)ind3]++;
-                        }
-                        {
-                            int ind1   = get_index3(carray[k*24+1+i],1);
-                            int ind2   = get_index3(carray[k*24+1+i],4);
-                            int ind3_a = get_index1(carray[k*24+1+i],7);
-                            int ind3_b = get_index2(carray[k*24+2+i],0);
-                            int ind3 = (ind3_a << 2) + ind3_b;
-                            histogram[(char)ind1]++;
-                            histogram[(char)ind2]++;
-                            histogram[(char)ind3]++;
-                        }
-                        {
-                            int ind1   = get_index3(carray[k*24+2+i],2);
-                            int ind2   = get_index3(carray[k*24+2+i],5);
-                            histogram[(char)ind1]++;
-                            histogram[(char)ind2]++;
-                        }
-                    }
-                }
-                long total = 0;
-                for ( int b(0)
-                    ; b < bits
-                    ; ++b
-                    )
-                {
-                    total += histogram[(char)b];
-                }
-                for ( int b(0)
-                    ; b < bits
-                    ; ++b
-                    )
-                {
-                    std::cout << b << " " << (double)histogram[(char)b]/(double)total << std::endl;
-                }
-                std::cout << std::endl;
-            }
-            break;
         case 4:
             {
                 void* array = &data[0];
@@ -566,7 +214,7 @@ int main()
                 {
                     histogram[(char)b] = 0;
                 }
-                for ( int k(0)
+                for ( std::size_t k(0)
                     ; k < data.size()
                     ; ++k
                     )
