@@ -120,6 +120,7 @@ public:
         }
      
         state = new int[num_patterns];
+        reset_state();
     }
 
     int operator () ( int input )
