@@ -27,9 +27,9 @@ int main()
         )
     {
         //data[k] = *reinterpret_cast<long*>(&c);
-        data[k] = (long)rand();// + 2147483647*(long)rand();
+        //data[k] = (long)rand();// + 2147483647*(long)rand();
         //data[k] = (long)rand() + 2147483647*(long)rand();
-        //data[k] = (long)rand() % 100;
+        data[k] = (long)rand() % 100;
     }
     int num_bits = 4;
     int bits = pow(2.0,num_bits)+0.001;
@@ -139,8 +139,21 @@ int main()
     construct_huffman_code ( histogram 
                            , huffman_code
                            );
+    long check_index = 64 ;
+    long iNUM = *reinterpret_cast<long*>(&data[check_index]);
     void* array = &data[0];
+    long original_size = data.size() * 8;
     char* carray = reinterpret_cast<char*>(array);
+    std::cout << get_bit(carray[check_index],0);
+    std::cout << get_bit(carray[check_index],1);
+    std::cout << get_bit(carray[check_index],2);
+    std::cout << get_bit(carray[check_index],3);
+    std::cout << get_bit(carray[check_index],4);
+    std::cout << get_bit(carray[check_index],5);
+    std::cout << get_bit(carray[check_index],6);
+    std::cout << get_bit(carray[check_index],7);
+    std::cout << std::endl;
+    std::cout << "NUM : " << iNUM << std::endl;
     std::vector<char> ovec ( sizeof(long)*data.size() );
     char* oarray = &ovec[0];
     int output_index = encode ( carray
@@ -156,8 +169,21 @@ int main()
     decode ( oarray
            , carray
            , huffman_code
-           , 8
+           , ovec.size()
+           , original_size
+           , num_bits
            );
+    long oNUM = *reinterpret_cast<long*>(&carray[check_index*8]);
+    std::cout << get_bit(carray[check_index],0);
+    std::cout << get_bit(carray[check_index],1);
+    std::cout << get_bit(carray[check_index],2);
+    std::cout << get_bit(carray[check_index],3);
+    std::cout << get_bit(carray[check_index],4);
+    std::cout << get_bit(carray[check_index],5);
+    std::cout << get_bit(carray[check_index],6);
+    std::cout << get_bit(carray[check_index],7);
+    std::cout << std::endl;
+    std::cout << "NUM : " << oNUM << std::endl;
     return 0;
 }
 

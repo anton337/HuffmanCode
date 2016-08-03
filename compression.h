@@ -13,7 +13,7 @@ int  encode ( char                                    const * raw_input
             , char                                          * encoded_output
             , std::map < char , std::vector < int > >       & huffman_code
             , std::size_t                                     num_char
-            , int                                             num_bits
+            , std::size_t                                     num_bits
             )
 {
     std::size_t output_index = 0;
@@ -84,8 +84,8 @@ int  encode ( char                                    const * raw_input
                     ; ++k
                     )
                 {
-                    int ind_1 = get_index2(raw_input[k],0);
-                    int ind_2 = get_index2(raw_input[k],4);
+                    int ind_1 = get_index4(raw_input[k],0);
+                    int ind_2 = get_index4(raw_input[k],4);
                     for ( std::size_t i(0)
                         ; i < huffman_code[ind_1].size()
                         ; ++i
@@ -124,18 +124,23 @@ void decode ( char                                    const * encoded_input
             , char                                          * decoded_output
             , std::map < char , std::vector < int > >       & huffman_code
             , std::size_t                                     num_char
+            , std::size_t                                     original_size
+            , std::size_t                                     num_bits
             )
 {
     
     std::vector<std::vector<int> > patterns;
+    std::map<int,int> index_map;
     std::map < char , std::vector < int > > :: const_iterator it = huffman_code . begin ();
-    std::map < int , std::vector < std::vector < int > > > sort_map;
+    std::map < int , std::vector < std::pair < char , std::vector < int > > > > sort_map;
     while(it!=huffman_code.end())
     {
-        sort_map [ it->second . size () ] . push_back ( it->second );
+        sort_map [ it->second . size () ] . push_back ( std::pair < char , std::vector < int > > ( it->first , it->second ) );
         ++it;
     }
-    std::map < int , std::vector < std::vector < int > > > :: const_reverse_iterator sort_it = sort_map . rbegin ();
+    std::map < int , std::vector < std::pair < char , std::vector < int > > > > :: const_reverse_iterator sort_it = sort_map . rbegin ();
+    index_map[-1] = -1;
+    int ind = 0;
     while(sort_it!=sort_map.rend())
     {
         for ( std::size_t k(0)
@@ -143,22 +148,18 @@ void decode ( char                                    const * encoded_input
             ; ++k
             )
         {
-            patterns . push_back ( sort_it -> second [ k ] );
+            index_map[ind] = (int)sort_it -> second [ k ] . first;
+            patterns . push_back ( sort_it -> second [ k ] . second );
+            ++ind;
         }
         ++sort_it;
     }
-    for ( int k(0); k < patterns.size() ; k++ )
-    {
-        for ( int i(0); i < patterns[k].size(); i++ )
-        {
-            std::cout << patterns[k][i];
-        }
-        std::cout << "   " << patterns[k].size() << std::endl;
-    }
+    std::size_t output_index = 0;
     FiniteAutomata<2> FA;
     FA . init_search ( patterns );
     for ( std::size_t k(0)
         ; k < num_char
+        && output_index/8 < original_size
         ; ++k
         )
     {
@@ -178,14 +179,131 @@ void decode ( char                                    const * encoded_input
         int ret_6 = FA ( ind_6 );
         int ret_7 = FA ( ind_7 );
         int ret_8 = FA ( ind_8 );
-        std::cout << ind_1 << " " << ret_1 << std::endl;
-        std::cout << ind_2 << " " << ret_2 << std::endl;
-        std::cout << ind_3 << " " << ret_3 << std::endl;
-        std::cout << ind_4 << " " << ret_4 << std::endl;
-        std::cout << ind_5 << " " << ret_5 << std::endl;
-        std::cout << ind_6 << " " << ret_6 << std::endl;
-        std::cout << ind_7 << " " << ret_7 << std::endl;
-        std::cout << ind_8 << " " << ret_8 << std::endl;
+        switch ( num_bits )
+        {
+            case 2:
+                {
+                    if ( index_map [ ret_1 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_1 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_1 ] / 2) % 2 ) ; 
+                        output_index += 2 ; 
+                    };
+                    if ( index_map [ ret_2 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_2 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_2 ] / 2) % 2 ) ; 
+                        output_index += 2 ; 
+                    };
+                    if ( index_map [ ret_3 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_3 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_3 ] / 2) % 2 ) ; 
+                        output_index += 2 ; 
+                    };
+                    if ( index_map [ ret_4 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_4 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_4 ] / 2) % 2 ) ; 
+                        output_index += 2 ; 
+                    };
+                    if ( index_map [ ret_5 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_5 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_5 ] / 2) % 2 ) ; 
+                        output_index += 2 ; 
+                    };
+                    if ( index_map [ ret_6 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_6 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_6 ] / 2) % 2 ) ; 
+                        output_index += 2 ; 
+                    };
+                    if ( index_map [ ret_7 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_7 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_7 ] / 2) % 2 ) ; 
+                        output_index += 2 ; 
+                    };
+                    if ( index_map [ ret_8 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_8 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_8 ] / 2) % 2 ) ; 
+                        output_index += 2 ; 
+                    };
+                }
+                break;
+            case 4:
+                {
+                    if ( index_map [ ret_1 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_1 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_1 ] / 2) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_1 ] / 4) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_1 ] / 8) % 2 ) ; 
+                        output_index += 4 ; 
+                    };
+                    if ( index_map [ ret_2 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_2 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_2 ] / 2) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_2 ] / 4) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_2 ] / 8) % 2 ) ; 
+                        output_index += 4 ; 
+                    };
+                    if ( index_map [ ret_3 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_3 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_3 ] / 2) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_3 ] / 4) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_3 ] / 8) % 2 ) ; 
+                        output_index += 4 ; 
+                    };
+                    if ( index_map [ ret_4 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_4 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_4 ] / 2) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_4 ] / 4) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_4 ] / 8) % 2 ) ; 
+                        output_index += 4 ; 
+                    };
+                    if ( index_map [ ret_5 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_5 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_5 ] / 2) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_5 ] / 4) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_5 ] / 8) % 2 ) ; 
+                        output_index += 4 ; 
+                    };
+                    if ( index_map [ ret_6 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_6 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_6 ] / 2) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_6 ] / 4) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_6 ] / 8) % 2 ) ; 
+                        output_index += 4 ; 
+                    };
+                    if ( index_map [ ret_7 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_7 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_7 ] / 2) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_7 ] / 4) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_7 ] / 8) % 2 ) ; 
+                        output_index += 4 ; 
+                    };
+                    if ( index_map [ ret_8 ] >= 0 ) 
+                    { 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_8 ]      % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_8 ] / 2) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_8 ] / 4) % 2 ) ; 
+                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_8 ] / 8) % 2 ) ; 
+                        output_index += 4 ; 
+                    };
+                }
+                break;
+            default:
+                break;
+        }
     }
 }
 
