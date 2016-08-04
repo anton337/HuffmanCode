@@ -185,50 +185,75 @@ void decode ( char                                    const * encoded_input
                 {
                     if ( index_map [ ret_1 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_1 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_1 ] / 2) % 2 ) ; 
+
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?((output_index%8>=6)?0xC0:0x30):((output_index%8>=2)?0x0C:0x03) 
+                                 , flip2 ( index_map [ ret_1 ] ) 
+                                 ) ; 
                         output_index += 2 ; 
                     };
                     if ( index_map [ ret_2 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_2 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_2 ] / 2) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?((output_index%8>=6)?0xC0:0x30):((output_index%8>=2)?0x0C:0x03) 
+                                 , flip2 ( index_map [ ret_2 ] ) 
+                                 ) ; 
                         output_index += 2 ; 
                     };
                     if ( index_map [ ret_3 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_3 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_3 ] / 2) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?((output_index%8>=6)?0xC0:0x30):((output_index%8>=2)?0x0C:0x03) 
+                                 , flip2 ( index_map [ ret_3 ] ) 
+                                 ) ; 
                         output_index += 2 ; 
                     };
                     if ( index_map [ ret_4 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_4 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_4 ] / 2) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?((output_index%8>=6)?0xC0:0x30):((output_index%8>=2)?0x0C:0x03) 
+                                 , flip2 ( index_map [ ret_4 ] ) 
+                                 ) ; 
                         output_index += 2 ; 
                     };
                     if ( index_map [ ret_5 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_5 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_5 ] / 2) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?((output_index%8>=6)?0xC0:0x30):((output_index%8>=2)?0x0C:0x03) 
+                                 , flip2 ( index_map [ ret_5 ] ) 
+                                 ) ; 
                         output_index += 2 ; 
                     };
                     if ( index_map [ ret_6 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_6 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_6 ] / 2) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?((output_index%8>=6)?0xC0:0x30):((output_index%8>=2)?0x0C:0x03) 
+                                 , flip2 ( index_map [ ret_6 ] ) 
+                                 ) ; 
                         output_index += 2 ; 
                     };
                     if ( index_map [ ret_7 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_7 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_7 ] / 2) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?((output_index%8>=6)?0xC0:0x30):((output_index%8>=2)?0x0C:0x03) 
+                                 , flip2 ( index_map [ ret_7 ] ) 
+                                 ) ; 
                         output_index += 2 ; 
                     };
                     if ( index_map [ ret_8 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 ,  index_map [ ret_8 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_8 ] / 2) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?((output_index%8>=6)?0xC0:0x30):((output_index%8>=2)?0x0C:0x03) 
+                                 , flip2 ( index_map [ ret_8 ] ) 
+                                 ) ; 
                         output_index += 2 ; 
                     };
                 }
@@ -237,66 +262,74 @@ void decode ( char                                    const * encoded_input
                 {
                     if ( index_map [ ret_1 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_1 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_1 ] / 2) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_1 ] / 4) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_1 ] / 8) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?0xF0:0x0F 
+                                 , flip4 ( index_map [ ret_1 ] ) 
+                                 );
                         output_index += 4 ; 
                     };
                     if ( index_map [ ret_2 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_2 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_2 ] / 2) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_2 ] / 4) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_2 ] / 8) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?0xF0:0x0F 
+                                 , flip4 ( index_map [ ret_2 ] ) 
+                                 );
                         output_index += 4 ; 
                     };
                     if ( index_map [ ret_3 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_3 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_3 ] / 2) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_3 ] / 4) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_3 ] / 8) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?0xF0:0x0F 
+                                 , flip4 ( index_map [ ret_3 ] ) 
+                                 );
                         output_index += 4 ; 
                     };
                     if ( index_map [ ret_4 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_4 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_4 ] / 2) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_4 ] / 4) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_4 ] / 8) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?0xF0:0x0F 
+                                 , flip4 ( index_map [ ret_4 ] ) 
+                                 );
                         output_index += 4 ; 
                     };
                     if ( index_map [ ret_5 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_5 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_5 ] / 2) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_5 ] / 4) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_5 ] / 8) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?0xF0:0x0F 
+                                 , flip4 ( index_map [ ret_5 ] ) 
+                                 );
                         output_index += 4 ; 
                     };
                     if ( index_map [ ret_6 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_6 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_6 ] / 2) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_6 ] / 4) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_6 ] / 8) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?0xF0:0x0F 
+                                 , flip4 ( index_map [ ret_6 ] ) 
+                                 );
                         output_index += 4 ; 
                     };
                     if ( index_map [ ret_7 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_7 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_7 ] / 2) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_7 ] / 4) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_7 ] / 8) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?0xF0:0x0F 
+                                 , flip4 ( index_map [ ret_7 ] ) 
+                                 );
                         output_index += 4 ; 
                     };
                     if ( index_map [ ret_8 ] >= 0 ) 
                     { 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 3 ,  index_map [ ret_8 ]      % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 2 , (index_map [ ret_8 ] / 2) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 1 , (index_map [ ret_8 ] / 4) % 2 ) ; 
-                        set_bit ( decoded_output[output_index/8] , output_index%8 + 0 , (index_map [ ret_8 ] / 8) % 2 ) ; 
+                        set_bits ( decoded_output[output_index/8] 
+                                 , output_index%8 
+                                 , (output_index%8>=4)?0xF0:0x0F 
+                                 , flip4 ( index_map [ ret_8 ] ) 
+                                 );
                         output_index += 4 ; 
                     };
                 }

@@ -15,10 +15,40 @@ void set_bit(char & number,int x,bool o)
     }
 }
 
+void clear_bits(char & number)
+{
+    number = '\0';
+}
+
 int get_bit(char x,int bit)
 {
     return (x >> bit) & 1;
 }
+
+void set_bits(char & number,int x,int mask,int bits)
+{
+    number &= ~mask;
+    number |= bits << x;
+}
+
+int flip8(char x)
+{
+    x = (x & 0xF0) >> 4 | (x & 0x0F) << 4;
+    x = (x & 0xCC) >> 2 | (x & 0x33) << 2;
+    x = (x & 0xAA) >> 1 | (x & 0x55) << 1;
+    return x;
+}
+
+int flip2(char x)
+{
+    return flip8(x) >> 6;
+}
+
+int flip4(char x)
+{
+    return flip8(x) >> 4;
+}
+
 
 int get_index1(char x,int offset)
 {

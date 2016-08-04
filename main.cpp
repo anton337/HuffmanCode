@@ -26,10 +26,7 @@ int main()
         ; ++k
         )
     {
-        //data[k] = *reinterpret_cast<long*>(&c);
-        //data[k] = (long)rand();// + 2147483647*(long)rand();
-        //data[k] = (long)rand() + 2147483647*(long)rand();
-        data[k] = (long)rand() % 100;
+        data[k] = (long)rand() % 10000;
     }
     int num_bits = 4;
     int bits = pow(2.0,num_bits)+0.001;
@@ -144,15 +141,30 @@ int main()
     void* array = &data[0];
     long original_size = data.size() * 8;
     char* carray = reinterpret_cast<char*>(array);
-    std::cout << get_bit(carray[check_index],0);
-    std::cout << get_bit(carray[check_index],1);
-    std::cout << get_bit(carray[check_index],2);
-    std::cout << get_bit(carray[check_index],3);
-    std::cout << get_bit(carray[check_index],4);
-    std::cout << get_bit(carray[check_index],5);
-    std::cout << get_bit(carray[check_index],6);
-    std::cout << get_bit(carray[check_index],7);
-    std::cout << std::endl;
+    for ( std::size_t i(0)
+        , j(0)
+        ; i < 64
+        ; ++i
+        )
+    {
+        for ( std::size_t k(0)
+            ; k < 16
+            ; ++k
+            , ++j
+            )
+        {
+            std::cout << ((get_bit(carray[check_index+8*j],0)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],1)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],2)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],3)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],4)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],5)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],6)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],7)==1)?'.':' ');
+            std::cout << "|";
+        }
+        std::cout << std::endl;
+    }
     std::cout << "NUM : " << iNUM << std::endl;
     std::vector<char> ovec ( sizeof(long)*data.size() );
     char* oarray = &ovec[0];
@@ -174,16 +186,32 @@ int main()
            , num_bits
            );
     long oNUM = *reinterpret_cast<long*>(&carray[check_index*8]);
-    std::cout << get_bit(carray[check_index],0);
-    std::cout << get_bit(carray[check_index],1);
-    std::cout << get_bit(carray[check_index],2);
-    std::cout << get_bit(carray[check_index],3);
-    std::cout << get_bit(carray[check_index],4);
-    std::cout << get_bit(carray[check_index],5);
-    std::cout << get_bit(carray[check_index],6);
-    std::cout << get_bit(carray[check_index],7);
-    std::cout << std::endl;
+    for ( std::size_t i(0)
+        , j(0)
+        ; i < 64
+        ; ++i
+        )
+    {
+        for ( std::size_t k(0)
+            ; k < 16
+            ; ++k
+            , ++j
+            )
+        {
+            std::cout << ((get_bit(carray[check_index+8*j],0)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],1)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],2)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],3)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],4)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],5)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],6)==1)?'.':' ');
+            std::cout << ((get_bit(carray[check_index+8*j],7)==1)?'.':' ');
+            std::cout << "|";
+        }
+        std::cout << std::endl;
+    }
     std::cout << "NUM : " << oNUM << std::endl;
+
     return 0;
 }
 
