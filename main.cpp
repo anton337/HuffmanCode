@@ -133,9 +133,9 @@ int main()
             break;
     }
     std::map < char , std::vector < int > > huffman_code;
-    construct_huffman_code ( histogram 
-                           , huffman_code
-                           );
+    HuffmanCode ( histogram 
+                , huffman_code
+                );
     long check_index = 64 ;
     long iNUM = *reinterpret_cast<long*>(&data[check_index]);
     void* array = &data[0];
