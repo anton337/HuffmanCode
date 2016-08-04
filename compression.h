@@ -155,8 +155,7 @@ void decode ( char                                    const * encoded_input
         ++sort_it;
     }
     std::size_t output_index = 0;
-    FiniteAutomata<2> FA;
-    FA . init_search ( patterns );
+    FiniteAutomata<2> FA( patterns );
     for ( std::size_t k(0)
         ; k < num_char
         && output_index/8 < original_size

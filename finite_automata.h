@@ -1,5 +1,16 @@
-#ifndef FINITE_AUTOMATA_H
-#define FINITE_AUTOMATA_H
+//***************************************************************************************//
+//
+//  Author:         Anton Kodochygov
+//
+//  File:           finite_automata.h
+//
+//  Description:    Implements a finite automata based searcher for binary inputs.
+//
+//
+//***************************************************************************************//
+
+#ifndef FINITE_AUTOATA_H
+#define FINITE_AUTOATA_H
 
 #include <vector>
 
@@ -7,139 +18,193 @@ template < int NUM_TRANSITIONS=2 >
 class FiniteAutomata
 {
 
+    //***************************************************************************************//
+    //  TypeDefs:
+    //***************************************************************************************//
 private:
-    int *** TF;
-    int * M;
-    int * state;
-    int num_patterns;
-    std::vector<std::vector<int> > patterns;
+    typedef                                             int                  integer_type     ;
+    typedef                       std::vector<integer_type>                  pattern_type     ;
+    typedef                       std::vector<pattern_type>            pattern_array_type     ;
+    typedef                                     std::size_t                     size_type     ;
+
+
+private:
+    //***************************************************************************************//
+    //  Member variables:
+    //  m_transition_function   -   represents the transition edges
+    //  m_final_state           -   terminating state
+    //  m_num_patterns          -   total number of patters
+    //  m_patterns              -   binary patterns to match
+    //
+    //***************************************************************************************//
+    integer_type                             ***                      m_transition_function   ;
+    integer_type                             *                        m_final_state           ;
+    integer_type                             *                        m_state                 ;
+    integer_type                                                      m_num_patterns          ;
+    pattern_array_type                                                m_patterns              ;
 
 public:
-    FiniteAutomata()
-    {
 
+    //***************************************************************************************//
+    //  Function:       FiniteAutomata
+    //  Description:    Constructor for this class
+    //***************************************************************************************//
+    FiniteAutomata ( pattern_array_type const & p_patterns )
+    : m_patterns ( p_patterns )
+    {
+        _impl_initialize_search_();
     }
 
+    //***************************************************************************************//
+    //  Function:       ~FiniteAutomata()
+    //  Description:    Destructor for this class
+    //***************************************************************************************//
     ~FiniteAutomata()
     {
 
     }
  
 private:
-    int getNextnstate ( std::vector<int> const & pat
-                      , int M
-                      , int nstate
-                      , int x
-                      )
+
+    //***************************************************************************************//
+    //  Function:       _impl_get_next_state_
+    //  Description:    Computes the next transition state.
+    //***************************************************************************************//
+    integer_type _impl_get_next_state_ ( pattern_type              const & p_pattern
+                                       , integer_type                      p_final_state
+                                       , integer_type                      p_state
+                                       , integer_type                      p_transition
+                                       )
     {
-        if (nstate < M && x == pat[nstate])
+        if (p_state < p_final_state && p_transition == p_pattern[p_state])
         {
-            return nstate+1;
+            return p_state+1;
         }
      
-        int ns, i; 
+        integer_type c_state, i; 
      
-        for (ns = nstate; ns > 0; ns--)
+        for (c_state = p_state; c_state > 0; c_state--)
         {
-            if(pat[ns-1] == x)
+            if(p_pattern[c_state-1] == p_transition)
             {
-                for(i = 0; i < ns-1; i++)
+                for(i = 0; i < c_state-1; i++)
                 {
-                    if (pat[i] != pat[nstate-ns+1+i])
+                    if (p_pattern[i] != p_pattern[p_state-c_state+1+i])
                         break;
                 }
-                if (i == ns-1)
-                    return ns;
+                if (i == c_state-1)
+                    return c_state;
             }
         }
      
         return 0;
     }
      
-    void computeTF ( std::vector<int> const & pat
-                   , int M
-                   , int ** TF
-                   )
+    //***************************************************************************************//
+    //  Function:       _impl_compute_transition_function_
+    //  Description:    Computes the global transition function.
+    //***************************************************************************************//
+    void _impl_compute_transition_function_ ( pattern_type     const & p_pattern
+                                            , integer_type             p_final_state
+                                            , integer_type          ** p_transition_function
+                                            )
     {
-        int nstate, x;
-        for (nstate = 0; nstate <= M; ++nstate)
-            for (x = 0; x < NUM_TRANSITIONS; ++x)
-               TF[nstate][x] = getNextnstate(pat, M,  nstate, x);
+        integer_type p_state, p_transition;
+        for (p_state = 0; p_state <= p_final_state; ++p_state)
+            for (p_transition = 0; p_transition < NUM_TRANSITIONS; ++p_transition)
+                p_transition_function[p_state][p_transition] = 
+                    _impl_get_next_state_ ( p_pattern
+                                          , p_final_state
+                                          , p_state
+                                          , p_transition
+                                          );
     }
 
-    void reset_state()
+    //***************************************************************************************//
+    //  Function:       _impl_reset_transition_state_
+    //  Description:    Resets the transition state to the beginning.
+    //***************************************************************************************//
+    void _impl_reset_trasition_state_()
     {
-        for ( int k(0)
-            ; k < num_patterns
+        for ( integer_type k(0)
+            ; k < m_num_patterns
             ; ++k
             )
         {
-            state[k] = 0;
+            m_state[k] = 0;
         }
     }
 
-public:
-    void init_search ( std::vector<std::vector<int> > const & p_patterns )
+    //***************************************************************************************//
+    //  Function:       _impl_initialize_search_
+    //  Description:    Initialize this finite automata.
+    //***************************************************************************************//
+    void _impl_initialize_search_()
     {
     
-        patterns = p_patterns;
-        num_patterns = patterns.size();
-        M = new int[num_patterns];
-        for ( int k(0)
-            ; k < num_patterns
+        m_num_patterns = m_patterns.size();
+        m_final_state = new integer_type[m_num_patterns];
+        for ( integer_type k(0)
+            ; k < m_num_patterns
             ; ++k
             )
         {
-            M[k] = patterns[k].size();
+            m_final_state[k] = m_patterns[k].size();
         }
      
-        TF = new int**[num_patterns];
+        m_transition_function = new integer_type**[m_num_patterns];
      
-        for ( int k(0)
-            ; k < num_patterns
+        for ( integer_type k(0)
+            ; k < m_num_patterns
             ; ++k
             )
         {
-            TF[k] = new int*[M[k]+1];
-            for ( int i(0)
-                ; i < M[k]+1
+            m_transition_function[k] = new integer_type*[m_final_state[k]+1];
+            for ( integer_type i(0)
+                ; i < m_final_state[k]+1
                 ; ++i
                 )
             {
-                TF[k][i] = new int[NUM_TRANSITIONS];
+                m_transition_function[k][i] = new integer_type[NUM_TRANSITIONS];
             }
-            computeTF(patterns[k], M[k], TF[k]);
+            _impl_compute_transition_function_(m_patterns[k], m_final_state[k], m_transition_function[k]);
         }
      
-        state = new int[num_patterns];
-        reset_state();
+        m_state = new integer_type[m_num_patterns];
+        _impl_reset_trasition_state_();
     }
 
-    int operator () ( int input )
+public:
+
+    //***************************************************************************************//
+    //  Function:       operator ()
+    //  Description:    Advances the finite automata.
+    //***************************************************************************************//
+    integer_type operator () ( integer_type p_input )
     {
-        for ( std::size_t k(0)
-            ; k < patterns.size()
+        for ( size_type k(0)
+            ; k < m_patterns.size()
             ; ++k
             )
         {
-            state[k] = TF[k][state[k]][input];
+            m_state[k] = m_transition_function[k][m_state[k]][p_input];
         }
-        int max_state = 0;
-        for ( std::size_t k(0)
-            ; k < patterns.size()
+        integer_type max_state = 0;
+        for ( size_type k(0)
+            ; k < m_patterns.size()
             ; ++k
             )
         {
-            max_state = std::max ( state[k] , max_state );
+            max_state = std::max ( m_state[k] , max_state );
         }
-        for ( std::size_t k(0)
-            ; k < patterns.size()
+        for ( size_type k(0)
+            ; k < m_patterns.size()
             ; ++k
             )
         {
-            if (state[k] == M[k] && max_state <= M[k])
+            if (m_state[k] == m_final_state[k] && max_state <= m_final_state[k])
             {
-                reset_state();
+                _impl_reset_trasition_state_();
                 return k;
             }
         }
