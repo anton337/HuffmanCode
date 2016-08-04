@@ -1,2 +1,0 @@
-g++ -Wall -O3 -g0 -c main.cpp -o main.o
-g++ -Wall -O3 -g0 -o huffman main.o
