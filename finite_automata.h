@@ -27,23 +27,18 @@ public:
  
 private:
     int getNextnstate ( std::vector<int> const & pat
-                     , int M
-                     , int nstate
-                     , int x
-                     )
+                      , int M
+                      , int nstate
+                      , int x
+                      )
     {
-        // If the character c is same as next character in pattern,
-        // then simply increment state
         if (nstate < M && x == pat[nstate])
+        {
             return nstate+1;
+        }
      
-        int ns, i;  // ns stores the result which is next nstate
+        int ns, i; 
      
-        // ns finally contains the longest prefix which is also suffix
-        // in "pat[0..state-1]c"
-     
-        // Start from the largest possible value and stop when you find
-        // a prefix which is also suffix
         for (ns = nstate; ns > 0; ns--)
         {
             if(pat[ns-1] == x)
@@ -61,8 +56,6 @@ private:
         return 0;
     }
      
-    /* This function builds the TF table which represents Finite Automata for a
-       given pattern  */
     void computeTF ( std::vector<int> const & pat
                    , int M
                    , int ** TF
@@ -86,10 +79,9 @@ private:
     }
 
 public:
-    void init_search ( std::vector<std::vector<int> > const & p_patterns
-                     )
+    void init_search ( std::vector<std::vector<int> > const & p_patterns )
     {
-  
+    
         patterns = p_patterns;
         num_patterns = patterns.size();
         M = new int[num_patterns];

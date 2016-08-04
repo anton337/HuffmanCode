@@ -1,11 +1,23 @@
 target=huffman
 
-all:
-	g++ -Wall -O3 -g0 -o ${target} main.cpp
+FLAGS=-Wall -O3 -g0
 
-debug:
-	g++ -Wall -O0 -g3 -o ${target} main.cpp
+DEBUF_FLAGS=-Wall -O0 -g3
+
+CXX=g++
+
+OBJECTS=main.o
+
+%.o: %.cpp 
+	${CXX} ${FLAGS} -c $< -o $@
+
+all: ${OBJECTS}
+	${CXX} ${FLAGS} -o ${target} ${OBJECTS}
+
+debug: ${OBJECTS}
+	${CXX} ${DEBUG_FLAGS} -o ${target} ${OBJECTS}
 
 clean:
+	rm -f *.o
 	rm -f ${target}
 
