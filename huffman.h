@@ -48,6 +48,7 @@ private:
     typedef                                             int                  integer_type     ;
     typedef                        std::map < char , long >                histogram_type     ; 
     typedef                                     std::size_t                     size_type     ;
+    typedef         std::map < char , std::vector < int > >             huffman_code_type     ;
 
 
 public:
@@ -56,12 +57,12 @@ public:
     //  Function:       HuffmanCode
     //  Description:    Constructor for this class
     //***************************************************************************************//
-    HuffmanCode ( histogram_type                          const & histogram 
-                , std::map < char , std::vector < int > >       & huffman_code
+    HuffmanCode (    histogram_type      const & p_histogram 
+                , huffman_code_type            & p_huffman_code
                 )
     {
-        _impl_construct_huffman_code_ ( histogram 
-                                      , huffman_code
+        _impl_construct_huffman_code_ ( p_histogram 
+                                      , p_huffman_code
                                       );
     }
 
@@ -84,10 +85,10 @@ private:
     {
 
     public:
-        HuffmanNode * O;
-        HuffmanNode * I;
-        char c;
-        float freq;
+        HuffmanNode * m_O_node      ;
+        HuffmanNode * m_I_node      ;
+        char          m_value       ;
+        float         m_frequency   ;
 
     public:
 
@@ -95,11 +96,13 @@ private:
         //  Function:       HuffmanNode
         //  Description:    Constructor for this class
         //***************************************************************************************//
-        HuffmanNode ( char _c , float _freq )
-        : O    ( NULL   )
-        , I    ( NULL   )
-        , c    ( _c     )
-        , freq ( 1.0/_freq )
+        HuffmanNode ( char      p_value 
+                    , float     p_frequency 
+                    )
+        : m_O_node    ( NULL                )
+        , m_I_node    ( NULL                )
+        , m_value     ( p_value             )
+        , m_frequency ( 1.0 / p_frequency   )
         {
     
         }
@@ -108,11 +111,13 @@ private:
         //  Function:       HuffmanNode
         //  Description:    Constructor for this class
         //***************************************************************************************//
-        HuffmanNode ( HuffmanNode * o , HuffmanNode * i )
-        : O ( o )
-        , I ( i )
-        , c ( '*' )
-        , freq ( 1.0 / ( 1.0/o->freq + 1.0/i->freq ) )
+        HuffmanNode ( HuffmanNode * p_O_node 
+                    , HuffmanNode * p_I_node 
+                    )
+        : m_O_node      ( p_O_node      )
+        , m_I_node      ( p_I_node      )
+        , m_value       ( '*'           )
+        , m_frequency   ( 1.0 / ( 1.0 / m_O_node->m_frequency + 1.0 / m_I_node->m_frequency ) )
         {
     
         }
@@ -129,9 +134,11 @@ private:
         //  Function:       operator ()
         //  Description:    less than operator
         //***************************************************************************************//
-        bool operator () ( HuffmanNode const * a , HuffmanNode const * b )
+        bool operator () ( HuffmanNode const * p_node_A
+                         , HuffmanNode const * p_node_B
+                         )
         {
-            return a->freq < b->freq;
+            return p_node_A->m_frequency < p_node_B->m_frequency ;
         }
     } huffmanComparator ;
 
@@ -141,29 +148,29 @@ private:
     //  Function:       _impl_populate_huffman_code_
     //  Description:    recursively populates the Huffman tree
     //***************************************************************************************//
-    void _impl_populate_huffman_code_ ( HuffmanNode const * N 
-                                      , std::map < char , std::vector < int > > & huffman_code 
-                                      , std::vector < int > address = std::vector < int > ()
+    void _impl_populate_huffman_code_ ( HuffmanNode          const * p_parent_node 
+                                      , huffman_code_type          & p_huffman_code 
+                                      , std::vector < int >          p_address = std::vector < int > ()
                                       )
     {
-        if ( N -> I == NULL && N -> O == NULL )
+        if ( p_parent_node -> m_I_node == NULL && p_parent_node -> m_O_node == NULL )
         {
-            huffman_code [ N->c ] = address;
+            p_huffman_code [ p_parent_node->m_value ] = p_address;
         }
         else
         {
-            std::vector < int > address_1 = address;
-            address_1 . push_back ( 1 );
-            _impl_populate_huffman_code_ ( N -> I 
-                                  , huffman_code
-                                  , address_1
-                                  );
-            std::vector < int > address_0 = address;
-            address_0 . push_back ( 0 );
-            _impl_populate_huffman_code_ ( N -> O 
-                                  , huffman_code
-                                  , address_0
-                                  );
+            std::vector < int > c_address_1 = p_address;
+            c_address_1 . push_back ( 1 );
+            _impl_populate_huffman_code_ ( p_parent_node -> m_I_node
+                                         , p_huffman_code
+                                         , c_address_1
+                                         );
+            std::vector < int > c_address_0 = p_address;
+            c_address_0 . push_back ( 0 );
+            _impl_populate_huffman_code_ ( p_parent_node -> m_O_node 
+                                         , p_huffman_code
+                                         , c_address_0
+                                         );
         }
     }
 
@@ -171,32 +178,46 @@ private:
     //  Function:       _impl_construct_huffman_code_
     //  Description:    constructs the Huffman tree
     //***************************************************************************************//
-    void _impl_construct_huffman_code_ ( histogram_type                          const & histogram 
-                                       , std::map < char , std::vector < int > >       & huffman_code
+    void _impl_construct_huffman_code_ ( histogram_type          const & p_histogram 
+                                       , huffman_code_type             & p_huffman_code
                                        )
     {
-        std::vector < HuffmanNode * > nodes;
-        histogram_type :: const_iterator it = histogram . begin () ;
-        while ( it != histogram . end () )
+        std::vector < HuffmanNode * > c_nodes;
+        histogram_type :: const_iterator it = p_histogram . begin () ;
+        while ( it != p_histogram . end () )
         {
-            nodes . push_back ( new HuffmanNode ( it->first , it->second ) );
+            c_nodes . push_back ( new HuffmanNode ( it->first , it->second ) );
             ++it;
         }
-        std::make_heap ( nodes . begin () , nodes . end () , huffmanComparator );
-        while ( nodes . size () > 1 )
+        std::make_heap ( c_nodes . begin () 
+                       , c_nodes . end () 
+                       , huffmanComparator 
+                       );
+        while ( c_nodes . size () > 1 )
         {
-            std::make_heap ( nodes . begin () , nodes . end () , huffmanComparator );
-            HuffmanNode * I = nodes . front ();
-            std::pop_heap ( nodes . begin () , nodes . end () , huffmanComparator );
-            nodes . pop_back ();
-            HuffmanNode * O = nodes . front ();
-            std::pop_heap ( nodes . begin () , nodes . end () , huffmanComparator );
-            nodes . pop_back ();
-            nodes . push_back ( new HuffmanNode ( I , O ) );
-            std::push_heap ( nodes . begin () , nodes . end () );
+            std::make_heap ( c_nodes . begin () 
+                           , c_nodes . end   () 
+                           , huffmanComparator 
+                           );
+            HuffmanNode * I = c_nodes . front ();
+            std::pop_heap ( c_nodes . begin () 
+                          , c_nodes . end   () 
+                          , huffmanComparator 
+                          );
+            c_nodes . pop_back ();
+            HuffmanNode * O = c_nodes . front ();
+            std::pop_heap ( c_nodes . begin () 
+                          , c_nodes . end   () 
+                          , huffmanComparator 
+                          );
+            c_nodes . pop_back ();
+            c_nodes . push_back ( new HuffmanNode ( I , O ) );
+            std::push_heap ( c_nodes . begin () 
+                           , c_nodes . end   () 
+                           );
         }
-        _impl_populate_huffman_code_ ( nodes[0] , huffman_code );
-        print_heap ( nodes[0] );
+        _impl_populate_huffman_code_ ( c_nodes[0] , p_huffman_code );
+        print_heap ( c_nodes[0] );
     }
 
 public:
@@ -205,16 +226,18 @@ public:
     //  Function:       print_heap
     //  Description:    prints out the heap nodes along with normalized frequencies
     //***************************************************************************************//
-    void print_heap ( HuffmanNode const * N , std::string prefix = "" )
+    void print_heap ( HuffmanNode const * p_node 
+                    , std::string         p_prefix = "" 
+                    )
     {
-        if ( N -> I == NULL && N -> O == NULL )
+        if ( p_node -> m_I_node == NULL && p_node -> m_O_node == NULL )
         {
-            std::cout << prefix << " - " << (int)N->c << " " << N->freq << std::endl;
+            std::cout << p_prefix << " - " << (int)p_node->m_value << " " << p_node->m_frequency << std::endl;
         }
         else
         {
-            print_heap ( N -> I , prefix+"1" );
-            print_heap ( N -> O , prefix+"0" );
+            print_heap ( p_node -> m_I_node , p_prefix + "1" );
+            print_heap ( p_node -> m_O_node , p_prefix + "0" );
         }
     }
 
